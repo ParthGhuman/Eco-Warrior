@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Eco Warrior</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f1f8e9; padding: 20px; }
+    h1 { color: #2e7d32; text-align: center; }
+    .nav-button { margin: 5px; padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .section { display: none; margin-top: 30px; }
+    .active { display: block; }
+    li { margin: 5px 0; background: #c8e6c9; padding: 8px; border-radius: 5px; }
+    .items button { margin: 5px; padding: 8px 15px; background-color: #009688; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .results { margin-top: 20px; background-color: #b2dfdb; padding: 15px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+
+  <h1>♻️ Eco Warrior</h1>
+  <p style="text-align:center;">Small actions lead to a cleaner, greener world.</p>
+
+  <!-- Navigation Buttons -->
+  <div style="text-align:center;">
+    <button class="nav-button" onclick="showSection('suggestions')">Eco-Suggestions</button>
+    <button class="nav-button" onclick="showSection('waste')">Waste to Use</button>
+    <button class="nav-button" onclick="showSection('earning')">Eco-Earning</button>
+  </div>
+
+  <!-- Eco-Suggestions Section -->
+  <div class="section" id="suggestions">
+    <h2>🌿 Eco-Suggestions</h2>
+    <ul id="suggestionList"></ul>
+    <button onclick="loadNext()">More Suggestions</button>
+  </div>
+
+  <!-- Waste to Use Section -->
+  <div class="section" id="waste">
+    <h2>🔄 Waste to Use</h2>
+    <p>Select a household item to see reuse ideas:</p>
+    <div class="items" id="wasteButtons"></div>
+    <div class="results" id="usesDisplay"></div>
+  </div>
+
+  <!-- Eco-Earning Section -->
+  <div class="section" id="earning">
+    <h2>🎁 Eco-Earning</h2>
+    <p>Earn points by following eco-suggestions and practicing the 3 R's.</p>
+    <p>Points will convert into future rewards like Amazon vouchers and eco gift kits.</p>
+    <h3>🌟 Coming Soon… Stay Tuned!</h3>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+    showSection('suggestions'); // Show Eco-Suggestions by default
+
+    // Eco-Suggestions Logic
+    const suggestions = [
+      "Turn off the tap while brushing your teeth", "Switch off lights when leaving a room",
+      "Use cloth bags instead of plastic", "Reuse containers", "Compost kitchen waste",
+      "Donate unused items", "Use LED bulbs", "Plant a tree", "Carry your own bottle",
+      "Print only when necessary", "Avoid single-use plastics", "Use digital receipts",
+      "Repair items instead of replacing", "Sort and recycle trash properly", "Use public transport",
+      "Say no to disposable cutlery", "Join a cleanup drive", "Organize recycling events",
+      "Reduce food waste", "Share eco knowledge with others"
+    ];
+    let index = 0;
+    function loadNext() {
+      if (index < suggestions.length) {
+        const li = document.createElement('li');
+        li.textContent = suggestions[index];
+        document.getElementById('suggestionList').appendChild(li);
+        index++;
+      }
+    }
+    for (let i = 0; i < 4; i++) loadNext(); // Load first 4
+
+    // Waste to Use Logic
+    const reuseIdeas = {
+      "Plastic bottle": ["Planter", "Bird feeder", "Pencil holder", "Sprinkler"],
+      "Newspaper": ["Gift wrap", "Packing material", "Paper bags", "Drawer liners"],
+      "Old clothes": ["Cleaning rags", "Tote bags", "Cushions", "Patchwork crafts"],
+      "Cardboard boxes": ["Toy house", "Organizer", "Compost filler", "Gift boxes"],
+      "Glass jars": ["Spice container", "Candle holder", "Mini terrarium", "Piggy bank"],
+      "Tin cans": ["Desk organizer", "Lantern", "Cutlery holder", "Mini planter"],
+      "Broken crockery": ["Mosaic art", "Garden edging", "Jewelry tray", "Plant saucer"],
+      "Toothbrushes": ["Grout cleaner", "Jewelry scrubber", "Bike brush", "Detail brush"],
+      "Old towels": ["Pet bed liner", "Mop pads", "Floor cloth", "Picnic mat"],
+      "Bubble wrap": ["Insulate items", "Drawer cushion", "Craft filler", "Shoe padding"],
+      "Shoeboxes": ["Art supply bin", "Memory box", "Mini drawer", "Charging dock"],
+      "Plastic bags": ["Braided rope", "Trash liner", "Weaving material", "Waterproof stuffing"],
+      "Old batteries": ["Battery art", "Experiment prop", "Recycle safely", "Display item"],
+      "Egg cartons": ["Paint tray", "Seed starter", "Storage sorter", "Mini gift box"],
+      "Magazines": ["Collage art", "Envelope", "Wrapping paper", "Origami"],
+      "Corks": ["Bulletin board", "Keychains", "Plant tags", "Drawer stopper"],
+      "Used paper": ["Scrap pad", "Origami", "Doodle book", "Confetti"],
+      "Old CDs/DVDs": ["Coasters", "Wall art", "Reflectors", "Mini mirrors"],
+      "Tissue boxes": ["Phone stand", "Mini storage", "Pen holder", "Yarn dispenser"],
+      "Cereal boxes": ["Bookmarks", "Stationery tray", "Toy templates", "File organizers"]
+    };
+
+    const wasteButtons = document.getElementById("wasteButtons");
+    for (const item in reuseIdeas) {
+      const btn = document.createElement("button");
+      btn.textContent = item;
+      btn.onclick = () => showUses(item);
+      wasteButtons.appendChild(btn);
+    }
+
+    function showUses(item) {
+      const ideas = reuseIdeas[item];
+      const html = `<h3>Reuse Ideas for ${item}:</h3><ul>${ideas.map(i => `<li>${i}</li>`).join('')}</ul>`;
+      document.getElementById("usesDisplay").innerHTML = html;
+    }
+  </script>
+
+</body>
+</html>
