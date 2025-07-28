@@ -3,119 +3,419 @@
 <head>
   <meta charset="UTF-8">
   <title>Eco Warrior</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; background: #f1f8e9; padding: 20px; }
-    h1 { color: #2e7d32; text-align: center; }
-    .nav-button { margin: 5px; padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    .section { display: none; margin-top: 30px; }
-    .active { display: block; }
-    li { margin: 5px 0; background: #c8e6c9; padding: 8px; border-radius: 5px; }
-    .items button { margin: 5px; padding: 8px 15px; background-color: #009688; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    .results { margin-top: 20px; background-color: #b2dfdb; padding: 15px; border-radius: 6px; }
+    /* RESET & BASE */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:'Segoe UI', sans-serif;
+      background:#eef7ee; color:#2e2e2e;
+      display:flex; flex-direction:column;
+      min-height:100vh; transition:background .3s, color .3s;
+    }
+    h1,h2,h3,p { text-align:center; margin-bottom:.5em; }
+    p { line-height:1.4; }
+
+    /* NAME OVERLAY */
+    #nameOverlay {
+      position:fixed; inset:0;
+      background:rgba(255,255,255,0.95);
+      display:flex; align-items:center; justify-content:center;
+      z-index:999;
+    }
+    #nameOverlay .card {
+      width:90%; max-width:300px; padding:20px;
+      background:#fff; border-radius:10px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+    #nameOverlay input {
+      width:100%; padding:10px; margin:12px 0;
+      border:1px solid #ccc; border-radius:6px;
+      font-size:16px;
+    }
+
+    /* CONTENT & CARDS */
+    #content { flex:1; overflow-y:auto; padding:16px; padding-bottom:100px; }
+    .card {
+      background:#fff; border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom:16px; padding:16px;
+    }
+
+    /* Daily Challenges */
+    #dailyChallenges ul { list-style:none; }
+    #dailyChallenges li {
+      display:flex; align-items:center; background:#dcedc8;
+      padding:10px; margin:8px 0; border-radius:6px;
+      font-size:14px;
+    }
+    #dailyChallenges li.completed { opacity:.5; text-decoration:line-through; }
+
+    /* Chips */
+    .chips {
+      display:flex; flex-wrap:wrap; justify-content:center;
+      gap:8px; margin-bottom:16px;
+    }
+    .chip {
+      background:#b2dfdb; color:#004d40;
+      padding:8px 14px; border-radius:16px;
+      font-size:13px; cursor:pointer;
+      transition:background .2s;
+    }
+    .chip:hover { background:#80cbc4; }
+
+    /* BUTTONS */
+    .btn, .nav-button {
+      display:block; width:60%; margin:12px auto;
+      padding:12px; font-size:16px; border:none;
+      border-radius:8px; cursor:pointer;
+      background:#388e3c; color:#fff;
+      transition:background .2s, transform .1s;
+    }
+    .btn:hover, .nav-button:hover { background:#2e7d32; }
+    .btn:active, .nav-button:active { transform:scale(.98); }
+
+    /* NAVIGATION */
+    nav {
+      position:fixed; bottom:0; left:0; width:100%;
+      background:#fff; box-shadow:0 -2px 8px rgba(0,0,0,0.1);
+      display:flex; justify-content:space-around; padding:8px 0;
+    }
+    nav .nav-button {
+      background:none; color:#555; width:auto; margin:0;
+      padding:4px; font-size:14px; display:flex;
+      flex-direction:column; align-items:center;
+    }
+    nav .nav-button.active { color:#2e7d32; }
+
+    /* HIDDEN SECTIONS */
+    .section { display:none; }
+    .section.active { display:block; }
+
+    /* Eco-Earning */
+    #earning .card p { font-size:15px; }
+
+    /* DARK MODE */
+    .dark-mode {
+      background:#121212; color:#ffffff;
+    }
+    .dark-mode .card {
+      background:#1e1e1e;
+      box-shadow:0 2px 8px rgba(255,255,255,0.05);
+    }
+    .dark-mode .chip {
+      background:#37474f; color:#eceff1;
+    }
+    .dark-mode nav { background:#1e1e1e; }
+    .dark-mode .nav-button { color:#bbb; }
+    .dark-mode .nav-button.active { color:#90caf9; }
+    .dark-mode .btn { background:#388e3c; }
+    .dark-mode input {
+      background:#2e2e2e; color:#e0e0e0; border:1px solid #444;
+    }
+
+    /* CONFETTI */
+    .confetti-piece {
+      position:fixed; top:-10px; font-size:20px;
+      animation: fall 3s linear forwards;
+      pointer-events:none;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotateZ(360deg); }
+    }
   </style>
 </head>
 <body>
 
-  <h1>♻️ Eco Warrior</h1>
-  <p style="text-align:center;">Small actions lead to a cleaner, greener world.</p>
-
-  <!-- Navigation Buttons -->
-  <div style="text-align:center;">
-    <button class="nav-button" onclick="showSection('suggestions')">Eco-Suggestions</button>
-    <button class="nav-button" onclick="showSection('waste')">Waste to Use</button>
-    <button class="nav-button" onclick="showSection('earning')">Eco-Earning</button>
+  <!-- NAME PROMPT -->
+  <div id="nameOverlay">
+    <div class="card">
+      <h2>What's your name?</h2>
+      <input id="userNameInput" type="text" placeholder="Enter your name" />
+      <button class="btn" onclick="saveName()">Start</button>
+    </div>
   </div>
 
-  <!-- Eco-Suggestions Section -->
-  <div class="section" id="suggestions">
-    <h2>🌿 Eco-Suggestions</h2>
-    <ul id="suggestionList"></ul>
-    <button onclick="loadNext()">More Suggestions</button>
+  <div id="content">
+
+    <!-- ECO-SUGGESTIONS -->
+    <div class="section active" id="suggestions">
+      <h1>🌿 Eco-Suggestions</h1>
+      <h2 id="greeting"></h2>
+
+      <!-- Daily Challenges -->
+      <div class="card" id="dailyChallenges">
+        <h3>Today's Challenges</h3>
+        <ul id="dailyList"></ul>
+        <div id="dailyCountdown" style="font-size:14px; color:#555; display:none;">
+          Next challenges in <span id="dailyTimer"></span>
+        </div>
+      </div>
+
+      <!-- Congrats Banner -->
+      <h3 id="congrats" style="display:none; color:#2e7d32;"></h3>
+
+      <!-- Suggestions List -->
+      <div class="card">
+        <ul id="suggestionList"></ul>
+      </div>
+      <button class="btn" onclick="loadNext()">More Suggestions</button>
+    </div>
+
+    <!-- WASTE TO USE -->
+    <div class="section" id="waste">
+      <h1>🔄 Waste to Use</h1>
+      <div class="chips" id="wasteButtons"></div>
+      <div class="card" id="usesDisplay"></div>
+    </div>
+
+    <!-- ECO-EARNING -->
+    <div class="section" id="earning">
+      <h1>🎁 Eco-Earning</h1>
+      <div class="card">
+        <p>Earn points by following eco-suggestions and practicing the 3 R's.</p>
+        <p>Every green action brings you closer to exclusive rewards, from Amazon vouchers to eco-friendly gift kits.</p>
+        <p>We're building this feature right now—your patience plants seeds for something amazing!</p>
+        <h3>🌟 Coming Soon… Stay Tuned!</h3>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Waste to Use Section -->
-  <div class="section" id="waste">
-    <h2>🔄 Waste to Use</h2>
-    <p>Select a household item to see reuse ideas:</p>
-    <div class="items" id="wasteButtons"></div>
-    <div class="results" id="usesDisplay"></div>
-  </div>
+  <!-- BOTTOM NAV -->
+  <nav>
+    <button class="nav-button active" onclick="showSection('suggestions', this)">
+      🌿<br>Suggestions
+    </button>
+    <button class="nav-button" onclick="showSection('waste', this)">
+      🔄<br>Waste
+    </button>
+    <button class="nav-button" onclick="showSection('earning', this)">
+      🎁<br>Earning
+    </button>
+    <button class="nav-button" onclick="toggleTheme()">
+      🌙<br>Theme
+    </button>
+  </nav>
 
-  <!-- Eco-Earning Section -->
-  <div class="section" id="earning">
-    <h2>🎁 Eco-Earning</h2>
-    <p>Earn points by following eco-suggestions and practicing the 3 R's.</p>
-    <p>Points will convert into future rewards like Amazon vouchers and eco gift kits.</p>
-    <h3>🌟 Coming Soon… Stay Tuned!</h3>
-  </div>
-
-  <!-- JavaScript Logic -->
   <script>
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
+    /* USER NAME & GREETING */
+    let userName = localStorage.getItem('ecoName') || '';
+    const greetEl = document.getElementById('greeting');
+    function saveName() {
+      const val = document.getElementById('userNameInput').value.trim();
+      if (!val) return;
+      localStorage.setItem('ecoName', val);
+      userName = val;
+      document.getElementById('nameOverlay').style.display = 'none';
+      greetEl.textContent = `Hello, ${userName}!`;
     }
-    showSection('suggestions'); // Show Eco-Suggestions by default
+    if (userName) {
+      document.getElementById('nameOverlay').style.display = 'none';
+      greetEl.textContent = `Hello, ${userName}!`;
+    }
 
-    // Eco-Suggestions Logic
+    /* NAVIGATION & THEME */
+    function showSection(id, btn) {
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('nav .nav-button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    /* ECO-SUGGESTIONS */
     const suggestions = [
-      "Turn off the tap while brushing your teeth", "Switch off lights when leaving a room",
-      "Use cloth bags instead of plastic", "Reuse containers", "Compost kitchen waste",
-      "Donate unused items", "Use LED bulbs", "Plant a tree", "Carry your own bottle",
-      "Print only when necessary", "Avoid single-use plastics", "Use digital receipts",
-      "Repair items instead of replacing", "Sort and recycle trash properly", "Use public transport",
-      "Say no to disposable cutlery", "Join a cleanup drive", "Organize recycling events",
-      "Reduce food waste", "Share eco knowledge with others"
+      "Turn off the tap while brushing your teeth",
+      "Switch off lights when leaving a room",
+      "Use cloth bags instead of plastic",
+      "Reuse containers",
+      "Compost kitchen waste",
+      "Donate unused items",
+      "Use LED bulbs",
+      "Plant a tree",
+      "Carry your own bottle",
+      "Print only when necessary",
+      "Avoid single-use plastics",
+      "Use digital receipts",
+      "Repair items instead of replacing",
+      "Sort and recycle properly",
+      "Use public transport",
+      "Say no to disposable cutlery",
+      "Join a cleanup drive",
+      "Organize recycling events",
+      "Reduce food waste",
+      "Share eco tips with friends"
     ];
-    let index = 0;
+    let sIndex = 0, tickCount = 0;
+
     function loadNext() {
-      if (index < suggestions.length) {
+      if (sIndex >= suggestions.length) return;
+      setTimeout(() => {
+        const text = suggestions[sIndex++];
         const li = document.createElement('li');
-        li.textContent = suggestions[index];
+        li.innerHTML = `<label>
+          <input type="checkbox" onchange="markDone(this)" />
+          ${text}
+        </label>`;
         document.getElementById('suggestionList').appendChild(li);
-        index++;
+      }, 2000);
+    }
+    function markDone(chk) {
+      const li = chk.closest('li');
+      tickCount++;
+      li.classList.add('completed');
+      setTimeout(()=> li.remove(), 5000);
+
+      if (tickCount === 3) showConfetti();
+      if (tickCount === 2) {
+        const banner = document.getElementById('congrats');
+        banner.textContent = `You’re doing a good job, ${userName||'friend'}!`;
+        banner.style.display = 'block';
       }
     }
-    for (let i = 0; i < 4; i++) loadNext(); // Load first 4
+    for (let i=0; i<4; i++) loadNext();
 
-    // Waste to Use Logic
+    /* CONFETTI ANIMATION */
+    function showConfetti() {
+      const colors = ['#e91e63','#ffeb3b','#4caf50','#2196f3','#ff9800'];
+      for (let i = 0; i < 30; i++) {
+        const span = document.createElement('span');
+        span.textContent = '🎉';
+        span.className = 'confetti-piece';
+        span.style.left = Math.random()*100 + 'vw';
+        span.style.color = colors[Math.floor(Math.random()*colors.length)];
+        span.style.fontSize = (12+Math.random()*24)+'px';
+        document.body.appendChild(span);
+      }
+      setTimeout(() => {
+        document.querySelectorAll('.confetti-piece').forEach(e=>e.remove());
+      }, 3500);
+    }
+
+    /* DAILY CHALLENGES WITH 24H TIMER */
+    const dailyPool = [
+      "Swallow food without wasting a single grain",
+      "Take a 5-minute shower instead of 10",
+      "Unplug chargers when not in use",
+      "Carry a reusable cup for your coffee",
+      "Walk or cycle for short trips"
+    ];
+    let dailyData = JSON.parse(localStorage.getItem('dailyData') || '{}');
+
+    function initDaily() {
+      const now = Date.now();
+      if (dailyData.nextTimestamp && dailyData.nextTimestamp > now) {
+        // show countdown
+        renderCountdown();
+      } else {
+        // reset and pick three
+        const pick = [];
+        while(pick.length < 3) {
+          const c = dailyPool[Math.floor(Math.random()*dailyPool.length)];
+          if (!pick.includes(c)) pick.push(c);
+        }
+        dailyData = {
+          items: pick.map(text=>({ text, done: false })),
+          doneCount: 0,
+          nextTimestamp: null
+        };
+        localStorage.setItem('dailyData', JSON.stringify(dailyData));
+        renderDailyList();
+      }
+    }
+    function renderDailyList() {
+      const ul = document.getElementById('dailyList');
+      ul.innerHTML = '';
+      dailyData.items.forEach((item,i)=> {
+        const li = document.createElement('li');
+        if (item.done) li.classList.add('completed');
+        li.innerHTML = `<label>
+          <input type="checkbox" ${item.done?'checked disabled':''}
+            onchange="completeDaily(${i},this)" />
+          ${item.text}
+        </label>`;
+        ul.appendChild(li);
+      });
+      document.getElementById('dailyCountdown').style.display = 'none';
+    }
+    function completeDaily(idx,chk) {
+      dailyData.items[idx].done = true;
+      dailyData.doneCount++;
+      localStorage.setItem('dailyData', JSON.stringify(dailyData));
+      renderDailyList();
+      if (dailyData.doneCount === 3) {
+        // schedule next
+        dailyData.nextTimestamp = Date.now() + 24*3600*1000;
+        localStorage.setItem('dailyData', JSON.stringify(dailyData));
+        renderCountdown();
+      }
+    }
+    let countdownInterval;
+    function renderCountdown() {
+      clearInterval(countdownInterval);
+      document.getElementById('dailyList').innerHTML = '';
+      const cd = document.getElementById('dailyCountdown');
+      cd.style.display = 'block';
+      function update() {
+        const diff = dailyData.nextTimestamp - Date.now();
+        if (diff <= 0) {
+          clearInterval(countdownInterval);
+          initDaily();
+          return;
+        }
+        const h = String(Math.floor(diff/3600000)).padStart(2,'0');
+        const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+        const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+        document.getElementById('dailyTimer').textContent = `${h}:${m}:${s}`;
+      }
+      update();
+      countdownInterval = setInterval(update, 1000);
+    }
+
+    /* WASTE-TO-USE */
     const reuseIdeas = {
-      "Plastic bottle": ["Planter", "Bird feeder", "Pencil holder", "Sprinkler"],
-      "Newspaper": ["Gift wrap", "Packing material", "Paper bags", "Drawer liners"],
-      "Old clothes": ["Cleaning rags", "Tote bags", "Cushions", "Patchwork crafts"],
-      "Cardboard boxes": ["Toy house", "Organizer", "Compost filler", "Gift boxes"],
-      "Glass jars": ["Spice container", "Candle holder", "Mini terrarium", "Piggy bank"],
-      "Tin cans": ["Desk organizer", "Lantern", "Cutlery holder", "Mini planter"],
-      "Broken crockery": ["Mosaic art", "Garden edging", "Jewelry tray", "Plant saucer"],
-      "Toothbrushes": ["Grout cleaner", "Jewelry scrubber", "Bike brush", "Detail brush"],
-      "Old towels": ["Pet bed liner", "Mop pads", "Floor cloth", "Picnic mat"],
-      "Bubble wrap": ["Insulate items", "Drawer cushion", "Craft filler", "Shoe padding"],
-      "Shoeboxes": ["Art supply bin", "Memory box", "Mini drawer", "Charging dock"],
-      "Plastic bags": ["Braided rope", "Trash liner", "Weaving material", "Waterproof stuffing"],
-      "Old batteries": ["Battery art", "Experiment prop", "Recycle safely", "Display item"],
-      "Egg cartons": ["Paint tray", "Seed starter", "Storage sorter", "Mini gift box"],
-      "Magazines": ["Collage art", "Envelope", "Wrapping paper", "Origami"],
-      "Corks": ["Bulletin board", "Keychains", "Plant tags", "Drawer stopper"],
-      "Used paper": ["Scrap pad", "Origami", "Doodle book", "Confetti"],
-      "Old CDs/DVDs": ["Coasters", "Wall art", "Reflectors", "Mini mirrors"],
-      "Tissue boxes": ["Phone stand", "Mini storage", "Pen holder", "Yarn dispenser"],
-      "Cereal boxes": ["Bookmarks", "Stationery tray", "Toy templates", "File organizers"]
+      "Plastic bottle":["Planter","Bird feeder","Pencil holder","Sprinkler"],
+      "Newspaper":["Gift wrap","Packing material","Paper bags","Drawer liners"],
+      "Old clothes":["Cleaning rags","Tote bags","Cushions","Patchwork crafts"],
+      "Cardboard boxes":["Toy house","Organizer","Compost filler","Gift boxes"],
+      "Glass jars":["Spice jar","Candle holder","Mini terrarium","Piggy bank"],
+      "Tin cans":["Desk organizer","Lantern","Cutlery holder","Mini planter"],
+      "Broken crockery":["Mosaic art","Garden edge","Jewelry tray","Plant saucer"],
+      "Toothbrushes":["Grout cleaner","Jewelry scrubber","Bike brush","Detail brush"],
+      "Old towels":["Pet bed liner","Mop pads","Floor cloth","Picnic mat"],
+      "Bubble wrap":["Insulate","Drawer cushion","Craft filler","Shoe padding"],
+      "Shoeboxes":["Art bin","Memory box","Mini drawer","Phone dock"],
+      "Plastic bags":["Braided rope","Trash liner","Weaving material","Stuffing"],
+      "Old batteries":["Art prop","Science demo","Recycle drop","Decor item"],
+      "Egg cartons":["Paint tray","Seed starter","Sorter","Mini gift box"],
+      "Magazines":["Collage art","Envelopes","Wrapping paper","Origami"],
+      "Corks":["Bulletin board","Keychains","Plant tags","Drawer stopper"],
+      "Used paper":["Scrap pad","Origami","Doodle book","Confetti"],
+      "Old CDs/DVDs":["Coasters","Wall art","Reflectors","Mini mirror"],
+      "Tissue boxes":["Phone stand","Mini storage","Pen holder","Yarn dispenser"],
+      "Cereal boxes":["Bookmarks","Stationery tray","Toy template","File organizer"]
     };
-
-    const wasteButtons = document.getElementById("wasteButtons");
-    for (const item in reuseIdeas) {
-      const btn = document.createElement("button");
-      btn.textContent = item;
-      btn.onclick = () => showUses(item);
-      wasteButtons.appendChild(btn);
+    function initWaste() {
+      const container = document.getElementById("wasteButtons");
+      Object.keys(reuseIdeas).forEach(item=>{
+        const chip = document.createElement('div');
+        chip.className='chip'; chip.textContent=item;
+        chip.onclick=()=>showUses(item);
+        container.appendChild(chip);
+      });
     }
-
     function showUses(item) {
-      const ideas = reuseIdeas[item];
-      const html = `<h3>Reuse Ideas for ${item}:</h3><ul>${ideas.map(i => `<li>${i}</li>`).join('')}</ul>`;
-      document.getElementById("usesDisplay").innerHTML = html;
+      const list = reuseIdeas[item].map(i=>`<li>${i}</li>`).join('');
+      document.getElementById('usesDisplay').innerHTML =
+        `<h3>Reuse for "${item}"</h3><ul>${list}</ul>`;
     }
-  </script>
 
+    /* INIT ALL */
+    initDaily();
+    initWaste();
+  </script>
 </body>
 </html>
